@@ -114,11 +114,10 @@ public class Main {
 	
 	public static String randPuzzle() {
 		String initial = "012345678";
-		StringBuilder s = new StringBuilder(initial);
 		String state = "";
 
 		do{
-			state = shuffleString(s);
+			state = shuffleString(initial);
 		} while(!isSolvable(state));
 		
 		return state;
@@ -148,7 +147,8 @@ public class Main {
 		return state;
 	}
 	
-	public static String shuffleString(StringBuilder s) {
+	public static String shuffleString(String state) {
+		StringBuilder s = new StringBuilder(state);
 		char temp;
 		Random rand = ThreadLocalRandom.current();
 		
