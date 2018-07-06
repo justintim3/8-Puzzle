@@ -32,7 +32,7 @@ public class AStarTree {
 	
 	public void findGoal() {
 		while(!isGoalState(getHead().getState())) {
-			explore(getHead());
+			explore(getHead(), !isGoalState(getHead().getState()));
 			if(isGoalState(getHead().getState())) {
 				solutionPath.push(getHead());
 			}
@@ -71,41 +71,26 @@ public class AStarTree {
 		return depthList;
 	}
 	
-	private void explore(Node n) {
+	private void explore(Node n, boolean expandCondition) {
 		String state = n.getState();
 		int depth = n.getDepth();
 		int emptyTile = state.indexOf("0");
 		int x = emptyTile % 3;
 		int y = emptyTile / 3;
 		
-		if(!isGoalState(state)) {
+		if(expandCondition) {
+			int leftTile = emptyTile - 1, rightTile = emptyTile + 1, aboveTile = emptyTile - 3, belowTile = emptyTile + 3;
 			if(x != 0) {
-				String newState = expandNode(state, emptyTile, emptyTile - 1);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
+				addAction(state, depth + 1, emptyTile, leftTile);
 			}
 			if(x != 2) {
-				String newState = expandNode(state, emptyTile, emptyTile + 1);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
+				addAction(state, depth + 1, emptyTile, rightTile);
 			}
 			if(y != 0) {
-				String newState = expandNode(state, emptyTile, emptyTile - 3);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
+				addAction(state, depth + 1, emptyTile, aboveTile);
 			}
 			if(y != 2) {
-				String newState = expandNode(state, emptyTile, emptyTile + 3);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
+				addAction(state, depth + 1, emptyTile, belowTile);
 			}
 		}
 		explored.put(state, n);
@@ -113,50 +98,21 @@ public class AStarTree {
 	}
 	
 	private void explore(Node n, int depthGoal) {
-		String state = n.getState();
-		int depth = n.getDepth();
-		int emptyTile = state.indexOf("0");
-		int x = emptyTile % 3;
-		int y = emptyTile / 3;
-		
-		if(n.getDepth() < depthGoal) {
-			if(x != 0) {
-				String newState = expandNode(state, emptyTile, emptyTile - 1);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
-			}
-			if(x != 2) {
-				String newState = expandNode(state, emptyTile, emptyTile + 1);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
-			}
-			if(y != 0) {
-				String newState = expandNode(state, emptyTile, emptyTile - 3);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
-			}
-			if(y != 2) {
-				String newState = expandNode(state, emptyTile, emptyTile + 3);
-				if(!explored.containsKey(newState)) {
-					int hCost = hCost(newState, hNum);
-					frontier.add(new Node(newState, state, depth + 1, hCost, depth + 1 + hCost));
-				}
-			}
-		}
 		if(n.getDepth() == depthGoal && !explored.containsKey(n.getState())) {
 			depthList.add(n);
 		}
-		explored.put(state, n);
-		frontier.remove(n);
+		explore(n, n.getDepth() < depthGoal);
 	}
 	
-	private String expandNode(String state, int emptyTile, int swapTile) {
+	private void addAction(String state, int depth, int emptyTile, int swapTile) {
+		String newState = moveTiles(state, emptyTile, swapTile);
+		if(!explored.containsKey(newState)) {
+			int hCost = hCost(newState, hNum);
+			frontier.add(new Node(newState, state, depth, hCost, depth + hCost));
+		}
+	}
+	
+	private String moveTiles(String state, int emptyTile, int swapTile) {
 		char temp = state.charAt(swapTile);
 		StringBuilder newState = new StringBuilder(state);
 		newState.setCharAt(swapTile, '0');

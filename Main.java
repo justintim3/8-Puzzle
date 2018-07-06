@@ -95,6 +95,7 @@ public class Main {
 					integer = Character.getNumericValue(str.charAt(i));
 					if(integer < 0 || integer > 9) {
 						valid = false;
+						break;
 					}
 				}
 				if(valid) {
