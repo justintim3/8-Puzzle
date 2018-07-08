@@ -1,14 +1,17 @@
 import java.util.*;
 
 public class AStarTree {
+	Comparator<Node> comparator;
+	private PriorityQueue<Node> frontier;
+	private Hashtable<String, Node> explored;
+	private Stack<Node> solutionPath;
+	private LinkedList<Node> depthList;
 	private int hNum;
-	Comparator<Node> comparator = new NodeComparator();
-	private PriorityQueue<Node> frontier = new PriorityQueue<Node>(comparator);
-	private Hashtable<String, Node> explored = new Hashtable<String, Node>();
-	private Stack<Node> solutionPath = new Stack<Node>();
-	private LinkedList<Node> depthList = new LinkedList<Node>();
 	
 	public AStarTree(String state, int hNum) {
+		comparator = new NodeComparator();
+		frontier = new PriorityQueue<Node>(comparator);
+		explored = new Hashtable<String, Node>();
 		int hCost = hCost(state, hNum);
 		frontier.add(new Node(state, null, 0, hCost, hCost));
 		this.hNum = hNum;
@@ -31,6 +34,7 @@ public class AStarTree {
 	}
 	
 	public void findGoal() {
+		solutionPath = new Stack<Node>();
 		while(!isGoalState(getHead().getState())) {
 			explore(getHead(), !isGoalState(getHead().getState()));
 			if(isGoalState(getHead().getState())) {
@@ -64,6 +68,7 @@ public class AStarTree {
 	}
 	
 	public LinkedList<Node> findDepthStates(int depth) {
+		depthList = new LinkedList<Node>();
 		frontier.add(getHead());
 		while(getHead() != null) {
 			explore(getHead(), depth);
@@ -105,16 +110,16 @@ public class AStarTree {
 	}
 	
 	private void addAction(String state, int depth, int emptyTile, int swapTile) {
-		String newState = moveTiles(state, emptyTile, swapTile);
+		String newState = moveTile(state, emptyTile, swapTile);
 		if(!explored.containsKey(newState)) {
 			int hCost = hCost(newState, hNum);
 			frontier.add(new Node(newState, state, depth, hCost, depth + hCost));
 		}
 	}
 	
-	private String moveTiles(String state, int emptyTile, int swapTile) {
-		char temp = state.charAt(swapTile);
+	private String moveTile(String state, int emptyTile, int swapTile) {
 		StringBuilder newState = new StringBuilder(state);
+		char temp = state.charAt(swapTile);
 		newState.setCharAt(swapTile, '0');
 		newState.setCharAt(emptyTile, temp);
 		return newState.toString();
