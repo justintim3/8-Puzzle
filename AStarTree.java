@@ -41,10 +41,10 @@ public class AStarTree {
 				solutionPath.push(getHead());
 			}
 		}
-		findSolution();
+		findSolPath();
 	}
 	
-	private void findSolution() {
+	private void findSolPath() {
 		while(!solutionPath.isEmpty() && solutionPath.peek().getParent() != null) {
 			solutionPath.push(explored.get(solutionPath.peek().getParent()));
 		}
