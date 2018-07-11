@@ -26,7 +26,6 @@ public class Main {
 				
 				AStarTree tree = new AStarTree(state, 2);
 				tree.findGoal();
-				tree.findSolution();
 				tree.printSolution();
 			}
 			else if(menuChoice == 4) {
